@@ -1,0 +1,54 @@
+name: Build ShiftAssistant IPA
+
+# 手动触发：在 GitHub 网页上点 "Run workflow" 即可开始打包
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    # 这一行就是关键：在 GitHub 免费提供的 macOS 虚拟机上跑，里面预装了 Xcode
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: List project
+        run: xcodebuild -project ShiftAssistantNative.xcodeproj -list
+
+      - name: Build (unsigned, Release)
+        run: |
+          set -e
+          xcodebuild \
+            -project ShiftAssistantNative.xcodeproj \
+            -target ShiftAssistant \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            build
+
+      - name: Package into .ipa
+        run: |
+          set -e
+          APP_PATH="build/DerivedData/Build/Products/Release-iphoneos/ShiftAssistant.app"
+          ls -la "$APP_PATH"
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/
+          cd build
+          zip -r ShiftAssistant-unsigned.ipa Payload
+          ls -lh ShiftAssistant-unsigned.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShiftAssistant-ipa
+          path: build/ShiftAssistant-unsigned.ipa
+          retention-days: 7

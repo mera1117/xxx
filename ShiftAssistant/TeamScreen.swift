@@ -13,7 +13,19 @@ struct TeamScreen: View {
                 }
                 Section("成员") {
                     if store.data.teamMembers.isEmpty {
-                        ContentUnavailableView("还没有成员", systemImage: "person.3", description: Text("添加成员，建立本地团队名单。"))
+                        VStack(spacing: 12) {
+                            Image(systemName: "person.3")
+                                .font(.largeTitle)
+                                .foregroundStyle(.secondary)
+                            Text("还没有成员").font(.headline)
+                            Text("添加成员，建立本地团队名单。")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
+                        .listRowInsets(EdgeInsets())
                     }
                     ForEach(store.data.teamMembers) { member in
                         VStack(alignment: .leading, spacing: 4) {

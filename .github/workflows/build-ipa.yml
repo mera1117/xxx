@@ -24,7 +24,7 @@ jobs:
           set -e
           xcodebuild \
             -project ShiftAssistantNative.xcodeproj \
-            -target ShiftAssistant \
+            -scheme ShiftAssistant \
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build/DerivedData \
